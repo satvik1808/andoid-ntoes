@@ -22,6 +22,8 @@ import com.example.infinitenotes.data.Stroke as DataStroke
 fun InfiniteCanvas(
     strokes: List<DataStroke>,
     onStrokesChanged: (List<DataStroke>) -> Unit,
+    currentPenColor: Color = Color.Black,
+    currentPenWidth: Float = 5f,
     modifier: Modifier = Modifier
 ) {
     var scale by remember { mutableFloatStateOf(1f) }
@@ -33,6 +35,10 @@ fun InfiniteCanvas(
     }
 
     var currentStrokePoints by remember { mutableStateOf<List<Point>>(emptyList()) }
+    
+    val currentStrokes by rememberUpdatedState(strokes)
+    val currentColor by rememberUpdatedState(currentPenColor)
+    val currentWidth by rememberUpdatedState(currentPenWidth)
 
     Canvas(
         modifier = modifier
@@ -54,8 +60,12 @@ fun InfiniteCanvas(
                     },
                     onDragEnd = {
                         if (currentStrokePoints.isNotEmpty()) {
-                            val newStroke = DataStroke(points = currentStrokePoints)
-                            onStrokesChanged(strokes + newStroke)
+                            val newStroke = DataStroke(
+                                points = currentStrokePoints,
+                                color = currentColor.value.toLong(),
+                                width = currentWidth
+                            )
+                            onStrokesChanged(currentStrokes + newStroke)
                             currentStrokePoints = emptyList()
                         }
                     },
@@ -66,7 +76,11 @@ fun InfiniteCanvas(
             }
     ) {
         val allStrokes = if (currentStrokePoints.isNotEmpty()) {
-            strokes + DataStroke(points = currentStrokePoints)
+            strokes + DataStroke(
+                points = currentStrokePoints,
+                color = currentPenColor.value.toLong(),
+                width = currentPenWidth
+            )
         } else {
             strokes
         }

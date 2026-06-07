@@ -53,6 +53,11 @@ class NotesRepository(private val context: Context) {
         }
     }
 
+    suspend fun listNotes(): List<String> = withContext(Dispatchers.IO) {
+        val files = notesDir.listFiles { _, name -> name.endsWith(".json") }
+        files?.map { it.nameWithoutExtension } ?: emptyList()
+    }
+
     private fun exportToPdf(fileName: String, strokes: List<Stroke>) {
         if (strokes.isEmpty()) return
 
