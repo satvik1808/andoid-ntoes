@@ -52,6 +52,7 @@ fun NoteEditorScreen(
     val strokes by viewModel.strokes.collectAsStateWithLifecycle()
     val currentPenColor by viewModel.currentPenColor.collectAsStateWithLifecycle()
     val currentPenWidth by viewModel.currentPenWidth.collectAsStateWithLifecycle()
+    val allowFingerDrawing by viewModel.allowFingerDrawing.collectAsStateWithLifecycle()
 
     val colors = listOf(Color.Black, Color.Red, Color.Blue, Color.Green, Color(0xFFFFA500))
 
@@ -129,6 +130,7 @@ fun NoteEditorScreen(
                 onStrokesChanged = { viewModel.updateStrokes(it) },
                 currentPenColor = currentPenColor,
                 currentPenWidth = currentPenWidth,
+                allowFingerDrawing = allowFingerDrawing,
                 modifier = Modifier.fillMaxSize()
             )
         }

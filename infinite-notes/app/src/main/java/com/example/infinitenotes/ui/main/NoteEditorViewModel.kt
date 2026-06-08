@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.infinitenotes.data.NotesRepository
+import com.example.infinitenotes.data.SettingsRepository
 import com.example.infinitenotes.data.Stroke
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 
 class NoteEditorViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = NotesRepository(application)
+    private val settingsRepository = SettingsRepository(application)
     private var currentNoteName: String = ""
 
     private val _strokes = MutableStateFlow<List<Stroke>>(emptyList())
@@ -23,6 +25,8 @@ class NoteEditorViewModel(application: Application) : AndroidViewModel(applicati
 
     private val _currentPenWidth = MutableStateFlow(5f)
     val currentPenWidth: StateFlow<Float> = _currentPenWidth.asStateFlow()
+
+    val allowFingerDrawing: StateFlow<Boolean> = settingsRepository.allowFingerDrawing
 
     fun initialize(fileName: String) {
         if (currentNoteName == fileName) return

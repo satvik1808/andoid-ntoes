@@ -101,15 +101,22 @@ class NotesRepository(private val context: Context) {
         strokes.forEach { stroke ->
             if (stroke.points.isEmpty()) return@forEach
             paint.color = stroke.color.toInt()
-            paint.strokeWidth = stroke.width
-
-            val path = android.graphics.Path()
-            val start = stroke.points.first()
-            path.moveTo(start.x, start.y)
-            for (i in 1 until stroke.points.size) {
-                path.lineTo(stroke.points[i].x, stroke.points[i].y)
+            
+            if (stroke.points.size == 1) {
+                val p = stroke.points.first()
+                paint.style = android.graphics.Paint.Style.FILL
+                canvas.drawCircle(p.x, p.y, (stroke.width * p.pressure) / 2f, paint)
+                paint.style = android.graphics.Paint.Style.STROKE
+                return@forEach
             }
-            canvas.drawPath(path, paint)
+
+            for (i in 0 until stroke.points.size - 1) {
+                val p1 = stroke.points[i]
+                val p2 = stroke.points[i + 1]
+                val avgPressure = (p1.pressure + p2.pressure) / 2f
+                paint.strokeWidth = stroke.width * avgPressure
+                canvas.drawLine(p1.x, p1.y, p2.x, p2.y, paint)
+            }
         }
 
         document.finishPage(page)

@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Point(val x: Float, val y: Float)
+data class Point(val x: Float, val y: Float, val pressure: Float = 1.0f)
 
 @Serializable
 data class Stroke(

@@ -5,3 +5,4 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object FileManager : NavKey
 @Serializable data class NoteEditor(val fileName: String) : NavKey
+@Serializable data object Settings : NavKey
