@@ -4,8 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -33,10 +32,6 @@ fun InfiniteCanvas(
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
 
-    val transformableState = rememberTransformableState { zoomChange, offsetChange, _ ->
-        scale = (scale * zoomChange).coerceIn(0.1f, 10f)
-        offset += offsetChange
-    }
 
     var currentStrokePoints by remember { mutableStateOf<List<Point>>(emptyList()) }
     
@@ -49,7 +44,15 @@ fun InfiniteCanvas(
         modifier = modifier
             .fillMaxSize()
             .background(Color.White)
-            .transformable(state = transformableState)
+            .pointerInput(Unit) {
+                detectTransformGestures { centroid, pan, zoom, _ ->
+                    val oldScale = scale
+                    val newScale = (scale * zoom).coerceIn(0.1f, 10f)
+                    val scaleFactor = newScale / oldScale
+                    offset = centroid - (centroid - offset) * scaleFactor + pan
+                    scale = newScale
+                }
+            }
             .pointerInput(Unit) {
                 awaitEachGesture {
                     val down = awaitFirstDown(requireUnconsumed = false)
