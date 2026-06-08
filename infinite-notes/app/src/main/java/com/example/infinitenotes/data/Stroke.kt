@@ -2,6 +2,7 @@ package com.example.infinitenotes.data
 
 import androidx.compose.ui.graphics.Color
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class Point(val x: Float, val y: Float, val pressure: Float = 1.0f)
@@ -11,7 +12,32 @@ data class Stroke(
     val points: List<Point>,
     val color: Long = Color.Black.value.toLong(),
     val width: Float = 5f
-)
+) {
+    @Transient
+    private var _bounds: FloatArray? = null
+
+    val bounds: FloatArray
+        get() {
+            if (_bounds == null) {
+                if (points.isEmpty()) {
+                    _bounds = floatArrayOf(0f, 0f, 0f, 0f)
+                } else {
+                    var minX = Float.MAX_VALUE
+                    var maxX = -Float.MAX_VALUE
+                    var minY = Float.MAX_VALUE
+                    var maxY = -Float.MAX_VALUE
+                    for (p in points) {
+                        if (p.x < minX) minX = p.x
+                        if (p.x > maxX) maxX = p.x
+                        if (p.y < minY) minY = p.y
+                        if (p.y > maxY) maxY = p.y
+                    }
+                    _bounds = floatArrayOf(minX - width, minY - width, maxX + width, maxY + width)
+                }
+            }
+            return _bounds!!
+        }
+}
 
 fun catmullRom(p0: Point, p1: Point, p2: Point, p3: Point, t: Float): Point {
     val t2 = t * t
