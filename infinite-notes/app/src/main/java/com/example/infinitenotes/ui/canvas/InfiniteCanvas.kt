@@ -83,9 +83,20 @@ fun InfiniteCanvas(
                                 if (ptr.positionChanged()) {
                                     ptr.consume()
                                 }
+                                
+                                val newPoints = mutableListOf<Point>()
+                                // Capture all high-frequency hardware points that were batched
+                                ptr.historical.forEach { hist ->
+                                    val hX = (hist.position.x - offset.x) / scale
+                                    val hY = (hist.position.y - offset.y) / scale
+                                    newPoints.add(Point(hX, hY, ptr.pressure))
+                                }
+                                
                                 val canvasX = (ptr.position.x - offset.x) / scale
                                 val canvasY = (ptr.position.y - offset.y) / scale
-                                currentStrokePoints = currentStrokePoints + Point(canvasX, canvasY, ptr.pressure)
+                                newPoints.add(Point(canvasX, canvasY, ptr.pressure))
+                                
+                                currentStrokePoints = currentStrokePoints + newPoints
                             }
                         }
                     } while (event.changes.any { it.pressed })
